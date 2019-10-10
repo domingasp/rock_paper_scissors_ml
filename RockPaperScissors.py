@@ -37,19 +37,24 @@ class MainGUI:
         self.resultLabel = tk.Label(self.master, text = "Not started.")
         self.resultLabel.grid(row = 3, columnspan = 3)
 
+        # Add label images at desired size
+        self.rockLabelImage = resizeImage(os.path.join("images", "rock_label.png"), 60, 60)
+        self.paperLabelImage = resizeImage(os.path.join("images", "paper_label.png"), 60, 60)
+        self.scissorsLabelImage = resizeImage(os.path.join("images", "scissors_label.png"), 60, 60)
+
         # Adds the images at the desired size as variables that can be used by the buttons
-        self.rockImage = resizeImage(os.path.join("images", "rock_button.png"), 60, 60)
-        self.paperImage = resizeImage(os.path.join("images", "paper_button.png"), 60, 60)
-        self.scissorsImage = resizeImage(os.path.join("images", "scissors_button.png"), 60, 60)
+        self.rockButtonImage = resizeImage(os.path.join("images", "rock_button.png"), 60, 60)
+        self.paperButtonImage = resizeImage(os.path.join("images", "paper_button.png"), 60, 60)
+        self.scissorsButtonImage = resizeImage(os.path.join("images", "scissors_button.png"), 60, 60)
 
         # Create Rock, Paper, Scissors buttons for play (highlightthickness and bd are used to remove the default background from the buttons)
-        self.rockButton = tk.Button(self.master, image = self.rockImage, command = lambda: playGame(self, 0, gameStats), highlightthickness = 0, bd = 0)
+        self.rockButton = tk.Button(self.master, image = self.rockButtonImage, command = lambda: playGame(self, 0, gameStats), highlightthickness = 0, bd = 0)
         self.rockButton.grid(row = 4, column = 0, padx = 10, pady = 10)
 
-        self.paperButton = tk.Button(self.master, image = self.paperImage, command = lambda: playGame(self, 1, gameStats), highlightthickness = 0, bd = 0)
+        self.paperButton = tk.Button(self.master, image = self.paperButtonImage, command = lambda: playGame(self, 1, gameStats), highlightthickness = 0, bd = 0)
         self.paperButton.grid(row = 4, column = 1, pady = 10)
 
-        self.scissorsButton = tk.Button(self.master, image = self.scissorsImage, command = lambda: playGame(self, 2, gameStats), highlightthickness = 0, bd = 0)
+        self.scissorsButton = tk.Button(self.master, image = self.scissorsButtonImage, command = lambda: playGame(self, 2, gameStats), highlightthickness = 0, bd = 0)
         self.scissorsButton.grid(row = 4, column = 2, padx = 10, pady = 10)
 
 # Class to keep track of the current number of games the user and computer have won
@@ -75,30 +80,30 @@ def playGame(gui, usersGo, stats):
     computersGo = random.randint(0, 2)
 
     # Choices used when displaying in the GUI
-    weapons = ["Rock", "Paper", "Scissors"]
+    weapons = [gui.rockLabelImage, gui.paperLabelImage, gui.scissorsLabelImage]
 
     # Sets the "vs" label text to be empty and spanning only 1 column in prepation of the choices being displayed
     gui.vsLabel["text"] = ""
     gui.vsLabel.grid(row = 2, column = 1, columnspan = 1)
 
-    # Sets both choice labels to "Rock" as if playing with humans who say "Rock, Paper, Scissors" as they play
+    # Sets both choice labels to rock image as if playing with humans who say "Rock, Paper, Scissors" as they play
     # Timer to delay the next action of the game to allow the user time to see what is happening
-    gui.playerChoice["text"] = "Rock"
-    gui.computerChoice["text"] = "Rock"
+    gui.playerChoice["image"] = gui.rockLabelImage
+    gui.computerChoice["image"] = gui.rockLabelImage
     gui.master.update()
     time.sleep(0.6)
 
-    # Sets both choice labels to "Paper" as if playing with humans who say "Rock, Paper, Scissors" as they play
+    # Sets both choice labels to paper image as if playing with humans who say "Rock, Paper, Scissors" as they play
     # Timer to delay the next action of the game to allow the user time to see what is happening
-    gui.playerChoice["text"] = "Paper"
-    gui.computerChoice["text"] = "Paper"
+    gui.playerChoice["image"] = gui.paperLabelImage
+    gui.computerChoice["image"] = gui.paperLabelImage
     gui.master.update()
     time.sleep(0.6)
 
     # Sets the choice labels and the "vs" label to result in "$Player vs $Computer" being displayed with $Player and $Computer being the choices
     gui.vsLabel["text"] = "vs"
-    gui.playerChoice["text"] = str(weapons[usersGo])
-    gui.computerChoice["text"] = str(weapons[computersGo])
+    gui.playerChoice["image"] = weapons[usersGo]
+    gui.computerChoice["image"] = weapons[computersGo]
 
     # Checks whether the game is a tie
     if (usersGo == computersGo):
