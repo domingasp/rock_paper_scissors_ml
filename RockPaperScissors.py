@@ -15,6 +15,7 @@ class MainGUI:
         self.mainFrame = tk.Frame(self.master)
         self.mainFrame.grid()
 
+        # Initialise the font used for the game
         self.topFont = Font(family = "Arial", size = 12)
 
         # Displays the human players score
@@ -37,14 +38,14 @@ class MainGUI:
         self.computerChoice = tk.Label(self.master)
         self.computerChoice.grid(row = 3, column = 2)
 
-        # Middle label used to display the initial instruction as well as the "vs" text
+        # Middle label used to display the initial instruction as well as the result image
         self.resultLabel = tk.Label(self.master, text = "Please choose your weapon.", font = self.topFont)
         self.resultLabel.grid(row = 3, columnspan = 3)
 
         # Add label images at desired size
         self.winLabelImage = resizeImage(os.path.join("images", "win_label.png"), 45, 45)
-        self.loseLabelImage = resizeImage(os.path.join("images", "lose_label.png"), 60, 60)
-        self.tieLabelImage = resizeImage(os.path.join("images", "tie_label.png"), 60, 60)
+        self.loseLabelImage = resizeImage(os.path.join("images", "lose_label.png"), 45, 45)
+        self.tieLabelImage = resizeImage(os.path.join("images", "tie_label.png"), 45, 45)
         self.rockLabelImage = resizeImage(os.path.join("images", "rock_label.png"), 60, 60)
         self.paperLabelImage = resizeImage(os.path.join("images", "paper_label.png"), 60, 60)
         self.scissorsLabelImage = resizeImage(os.path.join("images", "scissors_label.png"), 60, 60)
