@@ -1,7 +1,8 @@
 ###################### Imports ######################
 # "random" for computer choices, "time" for delay, "tkinter" for GUI
-import random, time
+import random, time, os
 import tkinter as tk
+from PIL import Image, ImageTk
 
 ###################### Classes ######################
 # Initialises the GUI for the application. Allows manipulation of the GUI elements from other parts of the program
@@ -36,15 +37,20 @@ class MainGUI:
         self.resultLabel = tk.Label(self.master, text = "Not started.")
         self.resultLabel.grid(row = 3, columnspan = 3)
 
-        # Create Rock, Paper, Scissors buttons for play
-        self.rockButton = tk.Button(self.master, text = "Rock", width = 10, height = 2, command = lambda: playGame(self, 0, gameStats))
-        self.rockButton.grid(row = 4, column = 0)
+        # Adds the images at the desired size as variables that can be used by the buttons
+        self.rockImage = resizeImage(os.path.join("images", "rock_button.png"), 60, 60)
+        self.paperImage = resizeImage(os.path.join("images", "paper_button.png"), 60, 60)
+        self.scissorsImage = resizeImage(os.path.join("images", "scissors_button.png"), 60, 60)
 
-        self.paperButton = tk.Button(self.master, text = "Paper", width = 10, height = 2, command = lambda: playGame(self, 1, gameStats))
-        self.paperButton.grid(row = 4, column = 1)
+        # Create Rock, Paper, Scissors buttons for play (highlightthickness and bd are used to remove the default background from the buttons)
+        self.rockButton = tk.Button(self.master, image = self.rockImage, command = lambda: playGame(self, 0, gameStats), highlightthickness = 0, bd = 0)
+        self.rockButton.grid(row = 4, column = 0, padx = 10, pady = 10)
 
-        self.scissorsButton = tk.Button(self.master, text = "Scissors", width = 10, height = 2, command = lambda: playGame(self, 2, gameStats))
-        self.scissorsButton.grid(row = 4, column = 2)
+        self.paperButton = tk.Button(self.master, image = self.paperImage, command = lambda: playGame(self, 1, gameStats), highlightthickness = 0, bd = 0)
+        self.paperButton.grid(row = 4, column = 1, pady = 10)
+
+        self.scissorsButton = tk.Button(self.master, image = self.scissorsImage, command = lambda: playGame(self, 2, gameStats), highlightthickness = 0, bd = 0)
+        self.scissorsButton.grid(row = 4, column = 2, padx = 10, pady = 10)
 
 # Class to keep track of the current number of games the user and computer have won
 class GameStats:
@@ -52,6 +58,11 @@ class GameStats:
         self.userWon = 0
         self.computerWon = 0
 
+# filePath is the location of the image , height and width are the required dimensions of the resized image
+def resizeImage(filePath, height, width):
+        image = Image.open(filePath)
+        image = image.resize((height, width), Image.ANTIALIAS)
+        return ImageTk.PhotoImage(image)
 
 ###################### Functionality ######################
 # Plays a round of the game
