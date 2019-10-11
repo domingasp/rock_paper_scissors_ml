@@ -84,14 +84,68 @@ class ComputerBrain:
         self.previousPlayerGo1 = -1
         self.previousPlayerGo2 = -1
 
+        # Keeps track if the previous go the computer won or lost
+        # 0 = Lost
+        # 1 = Won
+        self.previousResult = -1
+
     # Determines which weapon the computer should choose
-    def chooseWeapon(self, computerGo1, computerGo2, playerGo1, playerGo2):
+    def chooseWeapon(self, computerGo1, computerGo2, playerGo1, playerGo2, previousResult):
         probabilityList = [0] * 33 + [1] * 33 + [2] * 33
 
         # If no goes have been played
         if (computerGo1 == -1 or playerGo1 == -1):
-            print()
+            probabilityList = [0] * 50 + [1] * 20 + [2] * 30
+        # 2+ go
+        else:
+            # If the last 2 user goes were the same the user is unlikely to play the same move again
+            if (playerGo1 == playerGo2):
+                # If player choices were rock
+                if (playerGo1 == 0):
+                    probabilityList = [0] * 15 + [1] * 35 + [2] * 50
+                # If player choices were paper
+                elif (playerGo1 == 1):
+                    probabilityList = [0] * 50 + [1] * 15 + [2] * 35
+                # If player choices were scissors
+                elif (playerGo1 == 2):
+                    probabilityList = [0] * 35 + [1] * 50 + [2] * 15
+            # If computer lost last game
+            elif (previousResult == 0):
+                # If player chose rock to win
+                if (playerGo1 == 0):
+                    probabilityList = [0] * 50 + [1] * 20 + [2] * 30
+                # If player chose paper to win
+                elif (playerGo1 == 1):
+                    probabilityList = [0] * 30 + [1] * 50 + [2] * 20
+                # If player chose scissors to win
+                elif (playerGo1 == 2):
+                    probabilityList = [0] * 20 + [1] * 35 + [2] * 45
+            # Last 2 goes have not been equal and computer won the last game
+            else:
+                # Computer last 2 goes were the same
+                if (computerGo1 == computerGo2):
+                    # If player choices were rock
+                    if (computerGo1 == 0):
+                        probabilityList = [0] * 20 + [1] * 40 + [2] * 40
+                    # If player choices were paper
+                    elif (computerGo1 == 1):
+                        probabilityList = [0] * 40 + [1] * 20 + [2] * 40
+                    # If player choices were scissors
+                    elif (computerGo1 == 2):
+                        probabilityList = [0] * 40 + [1] * 40 + [2] * 20
+                # Last 2 computer goes were not equal
+                else:
+                    # If player chose previously rock
+                    if (computerGo1 == 0):
+                        probabilityList = [0] * 20 + [1] * 40 + [2] * 40
+                    # If player chose previously paper
+                    elif (computerGo1 == 1):
+                        probabilityList = [0] * 40 + [1] * 20 + [2] * 40
+                    # If player chose previously scissors
+                    elif (computerGo1 == 2):
+                        probabilityList = [0] * 40 + [1] * 40 + [2] * 20
 
+        # Return a random choice from the list
         return random.choice(probabilityList)
 
 # filePath is the location of the image , height and width are the required dimensions of the resized image
@@ -108,7 +162,7 @@ def playGame(gui, usersGo, stats, computerBrain):
     gui.scissorsButton["state"] = "disabled"
 
     # Generates the computers go
-    computersGo = computerBrain.chooseWeapon(computerBrain.previousComputerGo1, computerBrain.previousComputerGo2, computerBrain.previousPlayerGo1, computerBrain.previousPlayerGo2)
+    computersGo = computerBrain.chooseWeapon(computerBrain.previousComputerGo1, computerBrain.previousComputerGo2, computerBrain.previousPlayerGo1, computerBrain.previousPlayerGo2, computerBrain.previousResult)
 
     # Choices used when displaying in the GUI
     weapons = [gui.rockLabelImage, gui.paperLabelImage, gui.scissorsLabelImage]
@@ -149,23 +203,29 @@ def playGame(gui, usersGo, stats, computerBrain):
             if (computersGo == 2):
                 gui.resultLabel["image"] = gui.winLabelImage
                 stats.userWon += 1
+                computerBrain.previousResult = 0
             else:
-                stats.computerWon += 1
                 gui.resultLabel["image"] = gui.loseLabelImage
+                stats.computerWon += 1
+                computerBrain.previousResult = 1
         elif (usersGo == 1):
             if (computersGo == 0):
                 gui.resultLabel["image"] = gui.winLabelImage
                 stats.userWon += 1
+                computerBrain.previousResult = 0
             else:
-                stats.computerWon += 1
                 gui.resultLabel["image"] = gui.loseLabelImage
+                stats.computerWon += 1
+                computerBrain.previousResult = 1
         if (usersGo == 2):
             if (computersGo == 1):
                 gui.resultLabel["image"] = gui.winLabelImage
                 stats.userWon += 1
+                computerBrain.previousResult = 0
             else:
-                stats.computerWon += 1
                 gui.resultLabel["image"] = gui.loseLabelImage
+                stats.computerWon += 1
+                computerBrain.previousResult = 1
 
     # Sets the player and computer score labels to reflect the new scores
     gui.playerScore["text"] = str(stats.userWon)
