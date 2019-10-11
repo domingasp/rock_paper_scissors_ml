@@ -1,5 +1,7 @@
 ###################### Imports ######################
-# "random" for computer choices, "time" for delay, "tkinter" for GUI
+# "random" for computer choices, "time" for delay, "tkinter" for GUI,
+# os for file paths, Font to initialise application font,
+# Image and ImageTk for loading and resizing images
 import random, time, os
 import tkinter as tk
 from tkinter.font import Font
@@ -9,7 +11,7 @@ from PIL import Image, ImageTk
 ###################### Classes ######################
 # Initialises the GUI for the application. Allows manipulation of the GUI elements from other parts of the program
 class MainGUI:
-    def __init__(self, master, gameStats):
+    def __init__(self, master, gameStats, computerBrain):
         self.master = master
         
         self.mainFrame = tk.Frame(self.master)
@@ -56,13 +58,13 @@ class MainGUI:
         self.scissorsButtonImage = resizeImage(os.path.join("images", "scissors_button.png"), 75, 75)
 
         # Create Rock, Paper, Scissors buttons for play (highlightthickness and bd are used to remove the default background from the buttons)
-        self.rockButton = tk.Button(self.master, image = self.rockButtonImage, command = lambda: playGame(self, 0, gameStats), highlightthickness = 0, bd = 0)
+        self.rockButton = tk.Button(self.master, image = self.rockButtonImage, command = lambda: playGame(self, 0, gameStats, computerBrain), highlightthickness = 0, bd = 0)
         self.rockButton.grid(row = 5, column = 0, padx = 10, pady = 10)
 
-        self.paperButton = tk.Button(self.master, image = self.paperButtonImage, command = lambda: playGame(self, 1, gameStats), highlightthickness = 0, bd = 0)
+        self.paperButton = tk.Button(self.master, image = self.paperButtonImage, command = lambda: playGame(self, 1, gameStats, computerBrain), highlightthickness = 0, bd = 0)
         self.paperButton.grid(row = 5, column = 1, pady = 10)
 
-        self.scissorsButton = tk.Button(self.master, image = self.scissorsButtonImage, command = lambda: playGame(self, 2, gameStats), highlightthickness = 0, bd = 0)
+        self.scissorsButton = tk.Button(self.master, image = self.scissorsButtonImage, command = lambda: playGame(self, 2, gameStats, computerBrain), highlightthickness = 0, bd = 0)
         self.scissorsButton.grid(row = 5, column = 2, padx = 10, pady = 10)
 
 # Class to keep track of the current number of games the user and computer have won
@@ -70,6 +72,27 @@ class GameStats:
     def __init__(self):
         self.userWon = 0
         self.computerWon = 0
+
+# Class to keep track of previous two goes of the computer and the player and determine which choice is likely to win
+class ComputerBrain:
+    def __init__(self):
+        # Keeps track of the players and computers previous two choices
+        # ...Go1 represents the previous go
+        # ...Go2 represents the go before ...Go1
+        self.previousComputerGo1 = -1
+        self.previousComputerGo2 = -1
+        self.previousPlayerGo1 = -1
+        self.previousPlayerGo2 = -1
+
+    # Determines which weapon the computer should choose
+    def chooseWeapon(self, computerGo1, computerGo2, playerGo1, playerGo2):
+        probabilityList = [0] * 33 + [1] * 33 + [2] * 33
+
+        # If no goes have been played
+        if (computerGo1 == -1 or playerGo1 == -1):
+            print()
+
+        return random.choice(probabilityList)
 
 # filePath is the location of the image , height and width are the required dimensions of the resized image
 def resizeImage(filePath, height, width):
@@ -79,13 +102,13 @@ def resizeImage(filePath, height, width):
 
 ###################### Functionality ######################
 # Plays a round of the game
-def playGame(gui, usersGo, stats):
+def playGame(gui, usersGo, stats, computerBrain):
     gui.rockButton["state"] = "disabled"
     gui.paperButton["state"] = "disabled"
     gui.scissorsButton["state"] = "disabled"
 
     # Generates the computers go
-    computersGo = random.randint(0, 2)
+    computersGo = computerBrain.chooseWeapon(computerBrain.previousComputerGo1, computerBrain.previousComputerGo2, computerBrain.previousPlayerGo1, computerBrain.previousPlayerGo2)
 
     # Choices used when displaying in the GUI
     weapons = [gui.rockLabelImage, gui.paperLabelImage, gui.scissorsLabelImage]
@@ -148,6 +171,12 @@ def playGame(gui, usersGo, stats):
     gui.playerScore["text"] = str(stats.userWon)
     gui.computerScore["text"] = str(stats.computerWon)
 
+    # Update computer brains memory to store the latest two turns
+    computerBrain.previousComputerGo2 = computerBrain.previousComputerGo1
+    computerBrain.previousComputerGo1 = computersGo
+    computerBrain.previousPlayerGo2 = computerBrain.previousPlayerGo1
+    computerBrain.previousPlayerGo1 = usersGo
+
     # Re-enables the bottom 3 buttons to allow the user to play again
     gui.rockButton["state"] = "normal"
     gui.paperButton["state"] = "normal"
@@ -158,7 +187,8 @@ def main():
     # Initialises the root, the GameStats class and the MainGUI class
     root = tk.Tk()
     gameStats = GameStats()
-    app = MainGUI(root, gameStats)
+    computerBrain = ComputerBrain()
+    app = MainGUI(root, gameStats, computerBrain)
     root.mainloop()
 
 # Runs the main function on start
